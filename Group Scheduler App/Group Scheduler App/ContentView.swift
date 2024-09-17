@@ -16,9 +16,9 @@ struct ContentView: View {
                     .font(.system(size: proxy.size.width / 6.55))
                     .fontWeight(.bold)
                     .multilineTextAlignment(.center)
-                    .padding(.bottom, proxy.size.height / 8)
+                    .padding(.bottom, proxy.size.height / 18)
                 
-                Button("New Schedule") {
+                Button("Create Schedule") {
                     let now = Date()
                     let formatter = DateFormatter()
                     formatter.timeZone = TimeZone.current
@@ -28,6 +28,15 @@ struct ContentView: View {
                 }
                 .padding(25)
                 .background(Color(red: 217/255, green: 217/255, blue: 52/255, opacity: 1.0))
+                .foregroundColor(Color(red: 0.0, green: 0.0, blue: 0.0, opacity: 0.85))
+                .font(.system(size: proxy.size.width / 13.1)) //og font size 30
+                .cornerRadius(12.5)
+                
+                Button("Join Schedule") {
+                    
+                }
+                .padding(25.0)
+                .background(Color(red: 84/255, green: 215/255, blue: 255/255, opacity: 1.0))
                 .foregroundColor(Color(red: 0.0, green: 0.0, blue: 0.0, opacity: 0.85))
                 .font(.system(size: proxy.size.width / 13.1)) //og font size 30
                 .cornerRadius(12.5)
