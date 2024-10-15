@@ -304,16 +304,24 @@ struct ScheduleView: View {
                             let daysSince = Double(((7 * week) + weekday))
                             let dayNum = Int(getDayNum(date: trackerDay + 86400 * daysSince))
                             let monthNum = Int(getMonthNum(date: trackerDay + 86400 * daysSince))
-                            let color = (monthNum == Int(getMonthNum(date: date))) ? Color.black : Color.gray
+                            let outLineColor = (monthNum == Int(getMonthNum(date: date))) ? Color.black : Color.gray
+                            let backgroundColor = (compareDays(date1: Date(), date2: trackerDay + 86400 * daysSince)) ? Color.teal : Color.white
                             
                             Text("\(dayNum)")
+                                .onTapGesture {
+                                    present = .Day
+                                    observedDate = trackerDay + 86400 * daysSince
+                                    turnOnDisplayButton(buttonIndex: 0)
+                                    turnOffDisplayButton(buttonIndex: 1)
+                                    turnOffDisplayButton(buttonIndex: 2)
+                                }
                                 .padding(.vertical, 30.0)
                                 .frame(maxWidth: .infinity,
                                        idealHeight: 100)
-                                .border(color, 
+                                .border(outLineColor,
                                         width: (monthNum == Int(getMonthNum(date: date))) ? 2 : 1)
-                                .foregroundStyle(color)
-                                .background((compareDays(date1: Date(), date2: trackerDay + 86400 * daysSince)) ? Color.teal : Color.white)
+                                .foregroundStyle(outLineColor)
+                                .background(backgroundColor)
                         }
                     }
                 }
