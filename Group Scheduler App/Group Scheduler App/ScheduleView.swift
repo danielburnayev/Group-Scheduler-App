@@ -313,6 +313,7 @@ struct ScheduleView: View {
                                 .border(color, 
                                         width: (monthNum == Int(getMonthNum(date: date))) ? 2 : 1)
                                 .foregroundStyle(color)
+                                .background((compareDays(date1: Date(), date2: trackerDay + 86400 * daysSince)) ? Color.teal : Color.white)
                         }
                     }
                 }
@@ -353,6 +354,7 @@ struct ScheduleView: View {
             Text(date.formatted(
                 Date.FormatStyle().weekday(.wide)
             ))
+            .background((compareDays(date1: Date(), date2: date)) ? Color.teal : Color.white)
         }
     }
     
