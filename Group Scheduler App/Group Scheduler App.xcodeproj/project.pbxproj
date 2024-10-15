@@ -19,10 +19,6 @@
 		535B09982C8790CD00E12095 /* Group_Scheduler_AppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535B09972C8790CD00E12095 /* Group_Scheduler_AppTests.swift */; };
 		535B09A22C8790CE00E12095 /* Group_Scheduler_AppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535B09A12C8790CE00E12095 /* Group_Scheduler_AppUITests.swift */; };
 		535B09A42C8790CE00E12095 /* Group_Scheduler_AppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535B09A32C8790CE00E12095 /* Group_Scheduler_AppUITestsLaunchTests.swift */; };
-		539597832CB5B18900E6331C /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 539597822CB5B18900E6331C /* FirebaseAuth */; };
-		539597852CB5B18900E6331C /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 539597842CB5B18900E6331C /* FirebaseCrashlytics */; };
-		539597872CB5B18900E6331C /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 539597862CB5B18900E6331C /* FirebaseFirestore */; };
-		539597892CB5B18900E6331C /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 539597882CB5B18900E6331C /* FirebaseStorage */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,10 +61,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				539597832CB5B18900E6331C /* FirebaseAuth in Frameworks */,
-				539597892CB5B18900E6331C /* FirebaseStorage in Frameworks */,
-				539597852CB5B18900E6331C /* FirebaseCrashlytics in Frameworks */,
-				539597872CB5B18900E6331C /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -167,10 +159,6 @@
 			);
 			name = "Group Scheduler App";
 			packageProductDependencies = (
-				539597822CB5B18900E6331C /* FirebaseAuth */,
-				539597842CB5B18900E6331C /* FirebaseCrashlytics */,
-				539597862CB5B18900E6331C /* FirebaseFirestore */,
-				539597882CB5B18900E6331C /* FirebaseStorage */,
 			);
 			productName = "Group Scheduler App";
 			productReference = 535B09832C8790CC00E12095 /* Group Scheduler App.app */;
@@ -630,29 +618,6 @@
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		539597822CB5B18900E6331C /* FirebaseAuth */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 539597812CB5B18900E6331C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAuth;
-		};
-		539597842CB5B18900E6331C /* FirebaseCrashlytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 539597812CB5B18900E6331C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseCrashlytics;
-		};
-		539597862CB5B18900E6331C /* FirebaseFirestore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 539597812CB5B18900E6331C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseFirestore;
-		};
-		539597882CB5B18900E6331C /* FirebaseStorage */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 539597812CB5B18900E6331C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseStorage;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 535B097B2C8790CC00E12095 /* Project object */;
 }
