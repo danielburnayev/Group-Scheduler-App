@@ -353,6 +353,13 @@ struct ScheduleView: View {
                          "\(Int(getDayNum(date: refDay)))" : "")
                         .bold()
                 }
+                .onTapGesture(count: 2, perform: {
+                    present = .Day
+                    observedDate = refDay
+                    turnOnDisplayButton(buttonIndex: 0)
+                    turnOffDisplayButton(buttonIndex: 1)
+                    turnOffDisplayButton(buttonIndex: 2)
+                })
                 .padding(.trailing,
                          ((present == .Week) ? paddingArrWeek : paddingArrMonth)[1])
                 .background((present == .Week && compareDays(date1: Date(), date2: refDay)) ? Color.teal : Color.white)
