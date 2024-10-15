@@ -11,7 +11,7 @@ import SwiftUI
 struct Group_Scheduler_AppApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(showSchedule: false)
         }
     }
 }
