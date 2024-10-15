@@ -308,13 +308,13 @@ struct ScheduleView: View {
                             let backgroundColor = (compareDays(date1: Date(), date2: trackerDay + 86400 * daysSince)) ? Color.teal : Color.white
                             
                             Text("\(dayNum)")
-                                .onTapGesture {
+                                .onTapGesture(count: 2, perform: {
                                     present = .Day
                                     observedDate = trackerDay + 86400 * daysSince
                                     turnOnDisplayButton(buttonIndex: 0)
                                     turnOffDisplayButton(buttonIndex: 1)
                                     turnOffDisplayButton(buttonIndex: 2)
-                                }
+                                })
                                 .padding(.vertical, 30.0)
                                 .frame(maxWidth: .infinity,
                                        idealHeight: 100)
