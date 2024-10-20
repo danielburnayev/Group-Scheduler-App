@@ -14,7 +14,10 @@ struct ScheduleView: View {
     @State var mainScreen: ContentView
     @State private var leaveSchedule: Bool = false
     @State private var twelveHourTime: Bool = true
+    @State private var showEventAdderScreen: Bool = false
     @State private var timeTypeTitle: String = "12 HR TIME"
+    @State private var newEventStartTime: String = ""
+    @State private var newEventEndTime: String = ""
     @State private var present: SchedulePresentOption = .Week
     @State private var observedDate: Date = Date()
     @State private var displayButtonColors: [[Color]] =
@@ -103,7 +106,12 @@ struct ScheduleView: View {
                         leaveSchedule = true
                         mainScreen.showSchedule = false
                         
-                    } //replace with a pull-up menu
+                    }
+                    .border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
+                    
+                    Button("Add Event") {
+                        showEventAdderScreen = true
+                    }
                     .border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
                     
                     Button("Demo button") {
@@ -114,6 +122,44 @@ struct ScheduleView: View {
                 .frame(maxWidth: .infinity,
                        maxHeight: 30)
                 .border(Color.black, width: 1)
+                .sheet(isPresented: $showEventAdderScreen,
+                       onDismiss: {
+                         print("sheet dismissed")
+                         newEventStartTime = ""
+                         newEventEndTime = ""
+                        },
+                       content: {
+                        VStack {
+                            Text("Add Event:")
+                            
+                            HStack {
+                                TextField("Start Time:", text: $newEventStartTime)
+                                    .frame(maxWidth: 100)
+                                    .border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/)
+                                Text("–")
+                                TextField("End Time:", text: $newEventEndTime)
+                                    .frame(maxWidth: 100)
+                                    .border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/)
+                                Toggle(timeTypeTitle, isOn:$twelveHourTime)
+                                    .toggleStyle(.button)
+                                    .onChange(of: twelveHourTime) {
+                                        timeTypeTitle =
+                                        ((twelveHourTime) ? "12" : "24") + " HR TIME"
+                                    }
+                            }
+                            
+                            Button("Include New Event") {
+                                showEventAdderScreen = false
+                            }
+                            .padding()
+                            .foregroundStyle(Color.black)
+                            .background(Color.blue)
+                            .clipShape(Capsule())
+                        }
+                        .presentationDetents([.height(200), .large])
+                        .frame(alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
+                       }
+                )
             }
         }
         else {
@@ -308,9 +354,9 @@ struct ScheduleView: View {
                             let backgroundColor = (compareDays(date1: Date(), date2: trackerDay + 86400 * daysSince)) ? Color.teal : Color.white
                             
                             Text("\(dayNum)")
-                                .onTapGesture(count: 2, perform: {
-                                    present = .Day
+                                .onTapGesture(perform: {
                                     observedDate = trackerDay + 86400 * daysSince
+                                    present = .Day
                                     turnOnDisplayButton(buttonIndex: 0)
                                     turnOffDisplayButton(buttonIndex: 1)
                                     turnOffDisplayButton(buttonIndex: 2)
@@ -353,9 +399,9 @@ struct ScheduleView: View {
                          "\(Int(getDayNum(date: refDay)))" : "")
                         .bold()
                 }
-                .onTapGesture(count: 2, perform: {
-                    present = .Day
+                .onTapGesture(perform: {
                     observedDate = refDay
+                    present = .Day
                     turnOnDisplayButton(buttonIndex: 0)
                     turnOffDisplayButton(buttonIndex: 1)
                     turnOffDisplayButton(buttonIndex: 2)
