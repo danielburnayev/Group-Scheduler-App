@@ -19,6 +19,7 @@
 		535B09982C8790CD00E12095 /* Group_Scheduler_AppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535B09972C8790CD00E12095 /* Group_Scheduler_AppTests.swift */; };
 		535B09A22C8790CE00E12095 /* Group_Scheduler_AppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535B09A12C8790CE00E12095 /* Group_Scheduler_AppUITests.swift */; };
 		535B09A42C8790CE00E12095 /* Group_Scheduler_AppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 535B09A32C8790CE00E12095 /* Group_Scheduler_AppUITestsLaunchTests.swift */; };
+		53CF10EA2CC5C915005B61AE /* AddEventScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53CF10E92CC5C915005B61AE /* AddEventScreenView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +55,7 @@
 		535B099D2C8790CE00E12095 /* Group Scheduler AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Group Scheduler AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		535B09A12C8790CE00E12095 /* Group_Scheduler_AppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Group_Scheduler_AppUITests.swift; sourceTree = "<group>"; };
 		535B09A32C8790CE00E12095 /* Group_Scheduler_AppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Group_Scheduler_AppUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		53CF10E92CC5C915005B61AE /* AddEventScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEventScreenView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,6 +108,7 @@
 			children = (
 				535B09862C8790CC00E12095 /* Group_Scheduler_AppApp.swift */,
 				5335CE622CAD09E50086E284 /* ScheduleView.swift */,
+				53CF10E92CC5C915005B61AE /* AddEventScreenView.swift */,
 				5335CE642CAF0DD20086E284 /* EventView.swift */,
 				5335CE662CAF2A130086E284 /* DayView.swift */,
 				535B09882C8790CC00E12095 /* ContentView.swift */,
@@ -278,6 +281,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				535B09892C8790CC00E12095 /* ContentView.swift in Sources */,
+				53CF10EA2CC5C915005B61AE /* AddEventScreenView.swift in Sources */,
 				5335CE692CB26E630086E284 /* SchedulePresentOption.swift in Sources */,
 				5335CE672CAF2A130086E284 /* DayView.swift in Sources */,
 				535B09872C8790CC00E12095 /* Group_Scheduler_AppApp.swift in Sources */,

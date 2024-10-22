@@ -15,9 +15,7 @@ struct ScheduleView: View {
     @State private var leaveSchedule: Bool = false
     @State private var twelveHourTime: Bool = true
     @State private var showEventAdderScreen: Bool = false
-    @State private var timeTypeTitle: String = "12 HR TIME"
-    @State private var newEventStartTime: String = ""
-    @State private var newEventEndTime: String = ""
+    @State private var timeTypeTitle: String = "12 HR"
     @State private var present: SchedulePresentOption = .Week
     @State private var observedDate: Date = Date()
     @State private var displayButtonColors: [[Color]] =
@@ -69,8 +67,9 @@ struct ScheduleView: View {
                         .toggleStyle(.button)
                         .onChange(of: twelveHourTime) {
                             timeTypeTitle =
-                            ((twelveHourTime) ? "12" : "24") + " HR TIME"
+                            ((twelveHourTime) ? "12" : "24") + " HR"
                         }
+                        .border(Color.blue, width: 2)
                 }
                 
                 Text("ID: \(ID)")
@@ -125,39 +124,9 @@ struct ScheduleView: View {
                 .sheet(isPresented: $showEventAdderScreen,
                        onDismiss: {
                          print("sheet dismissed")
-                         newEventStartTime = ""
-                         newEventEndTime = ""
                         },
                        content: {
-                        VStack {
-                            Text("Add Event:")
-                            
-                            HStack {
-                                TextField("Start Time:", text: $newEventStartTime)
-                                    .frame(maxWidth: 100)
-                                    .border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/)
-                                Text("–")
-                                TextField("End Time:", text: $newEventEndTime)
-                                    .frame(maxWidth: 100)
-                                    .border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/)
-                                Toggle(timeTypeTitle, isOn:$twelveHourTime)
-                                    .toggleStyle(.button)
-                                    .onChange(of: twelveHourTime) {
-                                        timeTypeTitle =
-                                        ((twelveHourTime) ? "12" : "24") + " HR TIME"
-                                    }
-                            }
-                            
-                            Button("Include New Event") {
-                                showEventAdderScreen = false
-                            }
-                            .padding()
-                            .foregroundStyle(Color.black)
-                            .background(Color.blue)
-                            .clipShape(Capsule())
-                        }
-                        .presentationDetents([.height(200), .large])
-                        .frame(alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
+                        AddEventScreenView()
                        }
                 )
             }
