@@ -14,10 +14,12 @@ struct AddEventScreenView: View {
     @State private var twelveHourTime: Bool = true
     @State private var newEventStartTime: String = ""
     @State private var newEventEndTime: String = ""
+    @State private var newEventDescription: String = ""
     @State private var timeTypeTitle: String = "12 HR"
     @State private var errorMessage: String = ""
     @State private var selectedDate: Date = Date()
     @State private var prevCharValue: UInt8? = 0
+    @State private var prevI: Int? = nil
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
@@ -34,15 +36,16 @@ struct AddEventScreenView: View {
                         .background(Color(red: 84/255, green: 215/255, blue: 255/255, opacity: 1.0))
                         .clipShape(Capsule())
                         .multilineTextAlignment(.center)
-                        .onChange(of: newEventStartTime) {
-                            newEventStartTime = (twelveHourTime) ? enforce12HrFormat(eventTime: newEventStartTime) : enforce24HrFormat(eventTime: newEventStartTime)
+                        .onChange(of: newEventStartTime) { before, after in
+                            newEventStartTime = (twelveHourTime) ? enforce12HrFormat(eventTime: newEventStartTime, before) : enforce24HrFormat(eventTime: newEventStartTime)
                         }
                     
                     if (twelveHourTime) {
                         Toggle((startAMPMChecker) ? "AM" : "PM",
                                isOn: $startAMPMChecker)
-                            .toggleStyle(.button)
-                            .border(Color.blue, width: 1.5)
+                        .toggleStyle(.button)
+                        .border(Color.blue, width: 1.5)
+                        .onChange(of: startAMPMChecker) {clearErrorMessage()}
                     }
                 }
                 
@@ -55,15 +58,16 @@ struct AddEventScreenView: View {
                         .background(Color(red: 84/255, green: 215/255, blue: 255/255, opacity: 1.0))
                         .clipShape(Capsule())
                         .multilineTextAlignment(.center)
-                        .onChange(of: newEventEndTime) {
-                            newEventEndTime = (twelveHourTime) ? enforce12HrFormat(eventTime: newEventEndTime) : enforce24HrFormat(eventTime: newEventEndTime)
+                        .onChange(of: newEventEndTime) { before, after in
+                            newEventEndTime = (twelveHourTime) ? enforce12HrFormat(eventTime: newEventEndTime, before) : enforce24HrFormat(eventTime: newEventEndTime)
                         }
                     
                     if (twelveHourTime) {
                         Toggle((endAMPMChecker) ? "AM" : "PM",
                                isOn: $endAMPMChecker)
-                            .toggleStyle(.button)
-                            .border(Color.blue, width: 1.5)
+                        .toggleStyle(.button)
+                        .border(Color.blue, width: 1.5)
+                        .onChange(of: endAMPMChecker) {clearErrorMessage()}
                     }
                 }
                 
@@ -84,21 +88,23 @@ struct AddEventScreenView: View {
             DatePicker("Day:",
                        selection: $selectedDate,
                        displayedComponents: [.date])
-                .frame(maxWidth: 170)
-                .onChange(of: selectedDate) {
-                    let hourToSec = Calendar.current.component(Calendar.Component.hour, from: selectedDate) * 3600
-                    let minToSec = Calendar.current.component(Calendar.Component.minute, from: selectedDate) * 60
-                    
-                    selectedDate -= Double(hourToSec + minToSec)
-                    //selectedDate += Double()
-                    
-                    
-                }
-        
+            .frame(maxWidth: 170)
+            .onChange(of: selectedDate) {
+                clearErrorMessage()
+                
+                let hourToSec = Calendar.current.component(Calendar.Component.hour, from: selectedDate) * 3600
+                let minToSec = Calendar.current.component(Calendar.Component.minute, from: selectedDate) * 60
+                
+                selectedDate -= Double(hourToSec + minToSec)
+                //selectedDate += Double()
+            }
+            
+            
+            
             Button("Include New Event") {
                 clearErrorMessage()
                 if ((twelveHourTime) ? check12HourTime() : check24HourTime()) {
-                    // more stuff
+                    var event = EventView(eventColor: Color.yellow, startTime: newEventStartTime, endTime: newEventEndTime, eventDescription: newEventDescription)
                     dismiss()
                 }
             }
@@ -109,47 +115,94 @@ struct AddEventScreenView: View {
             
             Text(errorMessage)
                 .foregroundStyle(Color.red)
+                .multilineTextAlignment(.center)
         }
         .presentationDetents([.height(250), .large])
         .frame(alignment: .leading)
     }
     
-    //make sure the first 1 or 2 characters are numbers
-    //make sure the character after the first number/numbers is a colon
-    //make sure the characters after the colon are 2 numbers
-    func enforce12HrFormat(eventTime: String) -> String {
-        var newEventTime = eventTime
-        let charValue: UInt8
-        let theIndex: String.Index
-        if let thing = newEventTime.firstIndex(where: {$0.asciiValue! < 48 || $0.asciiValue! > 58}) {
-            charValue = newEventTime[thing].asciiValue!
-            theIndex = thing
-        }
-        else {
-            charValue = newEventTime.last?.asciiValue ?? 0
-            theIndex = newEventTime.endIndex
+    func enforce12HrFormat(eventTime: String, _ before: String) -> String {
+        var beforeTemp = String(before)
+        var newTimeTemp = String(eventTime)
+        
+        beforeTemp += (beforeTemp.count < 6) ? "\0" : ""
+        
+        var colonIndex = -1
+        var newCharIndex: String.Index? = nil
+        let beforeArr = Array(beforeTemp)
+        let nowArr = Array(newTimeTemp)
+        
+//        print("Before: \(beforeArr)")
+//        print("After: \(nowArr)")
+        
+        for i in 0..<newTimeTemp.count {
+            // evaluates the newly added character
+            if (newCharIndex == nil && beforeArr[i] != nowArr[i]) {
+                var currErrorStr = ""
+                //var beforeErrorStr = ""
+                //var tempBeforeArr =
+                newCharIndex = newTimeTemp.index(newTimeTemp.startIndex, offsetBy: i)
+                
+                checkForErrors12Hr(timeCount: newTimeTemp.count,
+                               arr: nowArr,
+                               i: i,
+                               errorStr: &currErrorStr,
+                               colonIndex: &colonIndex)
+//                if (prevI != nil) {
+//                    checkForErrors12Hr(timeCount: beforeArr.count,
+//                                   arr: beforeArr,
+//                                   i: prevI!,
+//                                   errorStr: &beforeErrorStr,
+//                                   colonIndex: &colonIndex)
+//                }
+                //print("\(i) \(prevI ?? -1)")
+                
+                //prevI = i
+                
+//                print("Before: \(beforeErrorStr) After: \(currErrorStr)")
+                
+                if (currErrorStr != "") {
+                    newTimeTemp.remove(at: newCharIndex!)
+                    assignErrorMessage(message: currErrorStr)
+                    break
+                }
+            }
+            //goes through all the other supposed-to-be-good characters
+            else if (nowArr[i] == ":") {colonIndex = i}
         }
         
-        if (newEventTime.count > 5) {
+        return newTimeTemp
+    }
+    
+    func checkForErrors12Hr(timeCount: Int, arr: [Character], i: Int, errorStr: inout String, colonIndex: inout Int) {
+        if (timeCount == 6) {
+            errorStr = "Times cannot have a length of more than 5."
+        }
+        else if ( (arr[i].asciiValue! < 48 || arr[i].asciiValue! > 58)) {
+            errorStr = "Only numbers 0 through 9 and the colon (:) are allowed."
+        }
+        else if (arr[i] == ":") {
+            if (colonIndex != -1) {
+                errorStr = "Times has more than one colon character (:)."
+            }
+            else if (i < 1 || i > 2) {
+                errorStr = "The colon character is placed incorrectly."
+            }
+        }
+        else if ( (arr[i].asciiValue ?? 0 >= 48 && arr[i].asciiValue ?? 0 <= 57)) {
+            if (timeCount > 1 && arr[1] == ":") {colonIndex = 1}
+            else if (timeCount > 2 && arr[2] == ":") {colonIndex = 2}
             
+            if ((colonIndex != -1 && timeCount - 1 - colonIndex > 2) ||
+                (colonIndex == -1 && timeCount > 2)) {
+                errorStr = "Numbers in the time are formatted incorrectly."
+            }
         }
-        else if (charValue != 0 && (charValue < 48 || charValue > 57)) {
-            
-        }
-        else if ((prevCharValue == 0 ||
-                  (prevCharValue! >= 48 && prevCharValue! <= 58)) &&
-                    (charValue == 0 || (charValue >= 48 && charValue <= 58))) {
-            clearErrorMessage()
-        }
-        
-        prevCharValue = charValue
-        
-        return newEventTime
     }
     
     func enforce24HrFormat(eventTime: String) -> String {
         var newEventTime = eventTime
-        let charValue: UInt8
+        var charValue: UInt8
         let theIndex: String.Index
         if let thing = newEventTime.firstIndex(where: {$0.asciiValue! < 48 || $0.asciiValue! > 57}) {
             charValue = newEventTime[thing].asciiValue!
@@ -159,18 +212,19 @@ struct AddEventScreenView: View {
             charValue = newEventTime.last?.asciiValue ?? 0
             theIndex = newEventTime.endIndex
         }
-        
+
         if (newEventTime.count > 4) {
+            assignErrorMessage(message: "Time cannot have a length of more than 4.")
             if (charValue >= 48 && charValue <= 57) {newEventTime = String(newEventTime.dropLast())}
             else {newEventTime.remove(at: theIndex)}
+            charValue = 3 //forcing the ascii value to forcefully reach the proper else if branchs
         }
         else if (charValue != 0 && (charValue < 48 || charValue > 57)) {
             newEventTime.remove(at: theIndex)
             assignErrorMessage(message: "Only numbers 0 through 9 are allowed.")
         }
-        else if ((prevCharValue == 0 ||
-                  (prevCharValue! >= 48 && prevCharValue! <= 57)) &&
-                    (charValue == 0 || (charValue >= 48 && charValue <= 57))) {
+        else if ((prevCharValue == 0 || (prevCharValue! >= 48 && prevCharValue! <= 57)) &&
+                 (charValue == 0 || (charValue >= 48 && charValue <= 57))) {
             clearErrorMessage()
         }
         
@@ -185,15 +239,14 @@ struct AddEventScreenView: View {
         let startTimeArr = newEventStartTime.split(separator: ":")
         let endTimeArr = newEventEndTime.split(separator: ":")
         
-        let startChecker = check12HourTimeDigits(arr: startTimeArr, errorMessage: "The start time must be a proper 12-hour time (remove any unnecessary zeros, if necessary).\n")
-        let endChecker = check12HourTimeDigits(arr: startTimeArr, errorMessage: "The end time must be a proper 12-hour time (remove any unnecessary zeros, if necessary).\n")
+        let startChecker = check12HourTimeDigits(arr: startTimeArr, errorMessage: "The start time must be a proper 12-hour time.\n")
+        let endChecker = check12HourTimeDigits(arr: endTimeArr, errorMessage: "The end time must be a proper 12-hour time.\n")
         if (!startChecker || !endChecker) {return false}
         
-        let startTime = twelveHourInto24Hour(timeArr: startTimeArr)
-        let endTime = twelveHourInto24Hour(timeArr: endTimeArr)
+        let startTime = twelveHourInto24Hour(timeArr: startTimeArr, amPM: startAMPMChecker)
+        let endTime = twelveHourInto24Hour(timeArr: endTimeArr, amPM: endAMPMChecker)
         
-        if (!checkForUnorderedTimes(startTime: startTime, endTime: endTime)) {return false}
-        return true
+        return checkForUnorderedTimes(startTime: startTime, endTime: endTime)
     }
     
     func check12HourTimeDigits(arr: [Substring], errorMessage: String) -> Bool {
@@ -207,8 +260,11 @@ struct AddEventScreenView: View {
         return validTime
     }
     
-    func twelveHourInto24Hour(timeArr: [Substring]) -> Int {
-        return Int(timeArr[0])! * 100 + ((startAMPMChecker) ? 0 : 12) * 100 + Int(timeArr[1])!
+    func twelveHourInto24Hour(timeArr: [Substring], amPM: Bool) -> Int {
+        let firstInt = Int(timeArr[0])!
+        let secondInt = Int(timeArr[1])!
+        
+        return ((firstInt == 12) ? firstInt - 12 : firstInt) * 100 + ((amPM) ? 0 : 12) * 100 + secondInt
     }
     
     func check24HourTime() -> Bool {
@@ -221,8 +277,7 @@ struct AddEventScreenView: View {
         let endCheck = check24HourTimeDigits(time: endTime, errorMessage: "The end time must be a proper 24-hour time.\n")
         if (!startCheck || !endCheck) {return false}
         
-        if (!checkForUnorderedTimes(startTime: startTime, endTime: endTime)) {return false}
-        return true
+        return checkForUnorderedTimes(startTime: startTime, endTime: endTime)
     }
     
     func check24HourTimeDigits(time: Int, errorMessage: String) -> Bool {
@@ -251,11 +306,11 @@ struct AddEventScreenView: View {
         var validLengths = true
         
         if (newEventStartTime.count < 4) {
-            appendToErrorMessage(message: "The start time must be " + ((twelveHourTime) ? "at least " : "") +  "4 numbers long.\n")
+            appendToErrorMessage(message: "The start time must be " + ((twelveHourTime) ? "at least " : "") +  "4 characters long.\n")
             validLengths = false
         }
         if (newEventEndTime.count < 4) {
-            appendToErrorMessage(message: "The end time must be " + ((twelveHourTime) ? "at least " : "") +  "4 numbers long.\n")
+            appendToErrorMessage(message: "The end time must be " + ((twelveHourTime) ? "at least " : "") +  "4 characters long.\n")
             validLengths = false
         }
         return validLengths
