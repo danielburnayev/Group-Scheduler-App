@@ -99,7 +99,17 @@ struct AddEventScreenView: View {
                 //selectedDate += Double()
             }
             
-            
+            HStack {
+                Text("Description:")
+                
+                TextField("Event Description", 
+                          text: $newEventDescription,
+                          axis: .vertical)
+                     .padding([.leading], 5)
+                    .frame(maxHeight: 50)
+                    .border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/)
+                    .lineLimit(2, reservesSpace: true)
+            }
             
             Button("Include New Event") {
                 clearErrorMessage()

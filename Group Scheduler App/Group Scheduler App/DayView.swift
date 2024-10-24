@@ -15,6 +15,7 @@ struct DayView: View {
     
     var body : some View {
         VStack {
+            /*
             EventView(eventColor: .yellow, startTime: "0010", endTime: "0210", eventDescription: "Event 1")
             EventView(eventColor: .blue, startTime: "0010", endTime: "0210", eventDescription: "Event 2")
             EventView(eventColor: .orange, startTime: "0010", endTime: "0210", eventDescription: "Event 3")
@@ -39,6 +40,7 @@ struct DayView: View {
             EventView(eventColor: .yellow, startTime: "0010", endTime: "0210", eventDescription: "Event 22")
             EventView(eventColor: .yellow, startTime: "0010", endTime: "0210", eventDescription: "Event 23")
             EventView(eventColor: .yellow, startTime: "0010", endTime: "0210", eventDescription: "Event 24")
+             */
         }
         .frame(minWidth: 1,
                maxWidth: width,
