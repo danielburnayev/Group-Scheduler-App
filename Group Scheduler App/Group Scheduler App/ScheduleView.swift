@@ -22,6 +22,7 @@ struct ScheduleView: View {
     [[Color.white, Color.blue],
      [Color.blue, Color.white],
      [Color.white, Color.blue]]
+    @State private var eventDictionary: [Date : DayView] = [:]
     
     var body : some View {
         if (!leaveSchedule) {
@@ -126,7 +127,7 @@ struct ScheduleView: View {
                          print("sheet dismissed")
                         },
                        content: {
-                        AddEventScreenView()
+                    AddEventScreenView(requestingSchedule: self)
                        }
                 )
             }
@@ -136,7 +137,14 @@ struct ScheduleView: View {
         }
     }
     
-    func getCorrespondingButtonText() -> [String] {
+    func addEvent(event: EventView) {
+        var coorespondingDayView = eventDictionary[event.eventDate]
+        if (coorespondingDayView == nil) {coorespondingDayView = DayView()}
+        //coorespondingDayView.events.append(event)
+        //eventDictionary.updateValue(coorespondingDayView.associatedDate, forKey: coorespondingDayView)
+    }
+    
+    private func getCorrespondingButtonText() -> [String] {
         switch present {
         case .Day:
             return ["Yesterday", "Tommorow"]
@@ -147,7 +155,7 @@ struct ScheduleView: View {
         }
     }
     
-    func getCorrespondingDayTitle(date: Date) -> String {
+    private func getCorrespondingDayTitle(date: Date) -> String {
         switch present {
         case .Day:
             return date.formatted(
@@ -164,7 +172,7 @@ struct ScheduleView: View {
             )
         case .Week:
             let startDay =
-                startOfWeek(date: date)
+                Date.startOfWeek(date: date)
                     .formatted(
                         Date.FormatStyle()
                             .month(.wide)
@@ -172,7 +180,7 @@ struct ScheduleView: View {
                     )
             
             let endDay =
-                endOfWeek(date: date)
+                Date.endOfWeek(date: date)
                     .formatted(
                         Date.FormatStyle()
                             .month(.wide)
@@ -182,73 +190,18 @@ struct ScheduleView: View {
             return "\(startDay) – \(endDay)"
         }
     }
-    
-    func getYearNum(date: Date) -> Double {
-        return Double(date.formatted(
-            Date.FormatStyle().year()
-        )) ?? 0
-    }
-    
-    func getMonthNum(date: Date) -> Double {
-        return Double(date.formatted(
-            Date.FormatStyle().month(.twoDigits)
-        )) ?? 0
-    }
-    
-    func getWeekDayNum(date: Date) -> Double {
-        return Double(date.formatted(
-            Date.FormatStyle().weekday(.oneDigit)
-        )) ?? 0
-    }
-    
-    func getWeekNum(date: Date) -> Double {
-        return Double(date.formatted(
-            Date.FormatStyle().week(.weekOfMonth)
-        )) ?? 0
-    }
-    
-    func getDayNum(date: Date) -> Double {
-        return Double(date.formatted(
-            Date.FormatStyle().day()
-        )) ?? 0
-    }
-    
-    func startOfWeek(date: Date) -> Date {
-        return date - (86400 * (getWeekDayNum(date: date) - 1))
-    }
-    
-    func endOfWeek(date: Date) -> Date {
-        return date + (86400 * (7 - getWeekDayNum(date: date)))
-    }
-    
-    func lastDayOfMonth(date: Date) -> Date {
-        let dayNum = Int(getDayNum(date: date))
-        var supposedLastDay = date + Double(86400 * (28 - dayNum))
-        
-        for maxDays in 29...31 {
-            if (getMonthNum(date: supposedLastDay + 86400) != getMonthNum(date: date)) {break}
-            supposedLastDay = date + Double(86400 * (maxDays - dayNum))
-        }
-        return supposedLastDay
-    }
-    
-    func compareDays(date1: Date, date2: Date) -> Bool {
-        return getYearNum(date: date1) == getYearNum(date: date2) &&
-        getMonthNum(date: date1) == getMonthNum(date: date2) &&
-        getDayNum(date: date1) == getDayNum(date: date2)
-    }
-    
-    func turnOnDisplayButton(buttonIndex: Int) {
+      
+    private func turnOnDisplayButton(buttonIndex: Int) {
         displayButtonColors[buttonIndex][0] = Color.blue
         displayButtonColors[buttonIndex][1] = Color.white
     }
     
-    func turnOffDisplayButton(buttonIndex: Int) {
+    private func turnOffDisplayButton(buttonIndex: Int) {
         displayButtonColors[buttonIndex][0] = Color.white
         displayButtonColors[buttonIndex][1] = Color.blue
     }
     
-    @ViewBuilder func displayTimeRangeHeader(date: Date) -> some View {
+    @ViewBuilder private func displayTimeRangeHeader(date: Date) -> some View {
         let buttonNames = getCorrespondingButtonText()
         Button(buttonNames[0]) {
             switch present {
@@ -256,7 +209,7 @@ struct ScheduleView: View {
                 observedDate -= 86400
             case .Month:
                 //moes the day to the last day of the previous month
-                observedDate -= 86400 * getDayNum(date: date)
+                observedDate -= 86400 * Date.getDayNum(date: date)
             case .Week:
                 observedDate -= 86400 * 7
             }
@@ -275,7 +228,7 @@ struct ScheduleView: View {
             case .Month:
                 //moes the day to the first day of the next month
                 observedDate += 86400 *
-                    (getDayNum(date: lastDayOfMonth(date: date)) - getDayNum(date: date) + 1)
+                (Date.getDayNum(date: Date.lastDayOfMonth(date: date)) - Date.getDayNum(date: date) + 1)
             case .Week:
                 observedDate += 86400 * 7
             }
@@ -284,7 +237,7 @@ struct ScheduleView: View {
         .border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
     }
     
-    @ViewBuilder func createCalenderDisplay(date: Date) -> some View {
+    @ViewBuilder private func createCalenderDisplay(date: Date) -> some View {
         if (present != .Month) {
             let dayAmount = (present == .Day) ? 1 : 7
             
@@ -304,23 +257,23 @@ struct ScheduleView: View {
                     .frame(maxWidth: 2,
                            maxHeight: .infinity)
                 
-                DayView(width: .infinity/*, startOfWeek(date: observedDate)*/)
+                DayView(/* startOfWeek(date: observedDate)*/)
             }
         }
         else {
-            let firstDayOfMonth = date - 86400 * (getDayNum(date: date) - 1)
-            let trackerDay = firstDayOfMonth - 86400 * (getWeekDayNum(date: firstDayOfMonth) - 1)
-            let numOfWeeks = Int(getWeekNum(date: lastDayOfMonth(date: date)))
+            let firstDayOfMonth = date - 86400 * (Date.getDayNum(date: date) - 1)
+            let trackerDay = firstDayOfMonth - 86400 * (Date.getWeekDayNum(date: firstDayOfMonth) - 1)
+            let numOfWeeks = Int(Date.getWeekNum(date: Date.lastDayOfMonth(date: date)))
             
             VStack {
                 ForEach(0..<numOfWeeks, id: \.self) {week in
                     HStack {
                         ForEach(0..<7) {weekday in
                             let daysSince = Double(((7 * week) + weekday))
-                            let dayNum = Int(getDayNum(date: trackerDay + 86400 * daysSince))
-                            let monthNum = Int(getMonthNum(date: trackerDay + 86400 * daysSince))
-                            let outLineColor = (monthNum == Int(getMonthNum(date: date))) ? Color.black : Color.gray
-                            let backgroundColor = (compareDays(date1: Date(), date2: trackerDay + 86400 * daysSince)) ? Color.teal : Color.white
+                            let dayNum = Int(Date.getDayNum(date: trackerDay + 86400 * daysSince))
+                            let monthNum = Int(Date.getMonthNum(date: trackerDay + 86400 * daysSince))
+                            let outLineColor = (monthNum == Int(Date.getMonthNum(date: date))) ? Color.black : Color.gray
+                            let backgroundColor = (Date.compareDays(date1: Date(), date2: trackerDay + 86400 * daysSince)) ? Color.teal : Color.white
                             
                             Text("\(dayNum)")
                                 .onTapGesture(perform: {
@@ -334,7 +287,7 @@ struct ScheduleView: View {
                                 .frame(maxWidth: .infinity,
                                        idealHeight: 100)
                                 .border(outLineColor,
-                                        width: (monthNum == Int(getMonthNum(date: date))) ? 2 : 1)
+                                        width: (monthNum == Int(Date.getMonthNum(date: date))) ? 2 : 1)
                                 .foregroundStyle(outLineColor)
                                 .background(backgroundColor)
                         }
@@ -344,7 +297,7 @@ struct ScheduleView: View {
         }
     }
     
-    @ViewBuilder func displayWeekdayText(date: Date) -> some View {
+    @ViewBuilder private func displayWeekdayText(date: Date) -> some View {
         if (present != .Day) {
             let paddingArrWeek: [Double] =
                 [27.5, 13, 10, 10, 10, 18, 10]
@@ -360,12 +313,12 @@ struct ScheduleView: View {
             }
             
             ForEach(0..<7, id:\.self) { index in
-                let refDay = startOfWeek(date: date) + Double(86400 * index)
+                let refDay = Date.startOfWeek(date: date) + Double(86400 * index)
                 
                 VStack {
                     Text(weekdayArr[index])
                     Text((present == .Week) ?
-                         "\(Int(getDayNum(date: refDay)))" : "")
+                         "\(Int(Date.getDayNum(date: refDay)))" : "")
                         .bold()
                 }
                 .onTapGesture(perform: {
@@ -377,14 +330,14 @@ struct ScheduleView: View {
                 })
                 .padding(.trailing,
                          ((present == .Week) ? paddingArrWeek : paddingArrMonth)[1])
-                .background((present == .Week && compareDays(date1: Date(), date2: refDay)) ? Color.teal : Color.white)
+                .background((present == .Week && Date.compareDays(date1: Date(), date2: refDay)) ? Color.teal : Color.white)
             }
         }
         else {
             Text(date.formatted(
                 Date.FormatStyle().weekday(.wide)
             ))
-            .background((compareDays(date1: Date(), date2: date)) ? Color.teal : Color.white)
+            .background((Date.compareDays(date1: Date(), date2: date)) ? Color.teal : Color.white)
         }
     }
     
