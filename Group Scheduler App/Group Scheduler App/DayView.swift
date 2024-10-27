@@ -12,15 +12,17 @@ struct DayView: View {
     
     @State var associatedDate: Date
     @Binding var events: [EventView]
+    @Binding var twelveHour: Bool
     
     var body : some View {
-        VStack {
+        ZStack {
             ForEach(0..<events.count, id:\.self) { index in
                 events[index]
-                    .padding(.top, CGFloat(integerLiteral: Date.getHourHum(date: events[index].eventDate)) * 115 +
-                                   (CGFloat(integerLiteral: Date.getMinuteHum(date: events[index].eventDate)) / 60) * 115)
+                    .offset(y: CGFloat(integerLiteral: Date.getHourHum(date: events[index].eventDate)) * ((twelveHour) ? 115 : 125) +
+                                   (CGFloat(integerLiteral: Date.getMinuteHum(date: events[index].eventDate)) / 60) * ((twelveHour) ? 115 : 125))
             }
-            //115 padding for every hour (for now)
+            //115 padding for every hour (for AMPM)
+            //125 padding for every hour (for 24-hour)
         }
         .frame(minWidth: 1,
                maxWidth: .infinity,

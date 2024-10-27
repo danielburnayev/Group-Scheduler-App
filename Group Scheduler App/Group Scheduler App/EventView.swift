@@ -32,7 +32,7 @@ struct EventView: View {
                maxHeight: 150,
                alignment: .topLeading)
         .background(eventColor)
-        .cornerRadius(5)
+        .border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/, width: 0.5)
         .onAppear() {
             if (twelveHourTime && !startTime.contains(":")) {twentyFourHourTo12Hour()}
             else if (!twelveHourTime && startTime.contains(":")) {twelveHourTo24Hour()}

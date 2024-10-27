@@ -98,7 +98,7 @@ struct ScheduleView: View {
                         createCalenderDisplay(date: observedDate)
                     }
                 }
-                .background(Color(red: 47/255, green: 237/255, blue: 211/255, opacity: 1.0))
+                .background(Color(red: 74/255, green: 255/255, blue: 230/255, opacity: 1.0))
                 .frame(maxWidth: .infinity,
                        maxHeight: .infinity,
                        alignment: .top)
@@ -123,7 +123,7 @@ struct ScheduleView: View {
                                                   eventDescription: "Demo 1",
                                                   twelveHourTime: $twelveHourTime))
                         
-                        addEvent(event: EventView(eventColor: Color.red,
+                        addEvent(event: EventView(eventColor: Color.blue,
                                                   startTime: "3:00am", endTime: "4:00am",
                                                   eventDate: Date.startOfWeek(date: observedDate) + 86400 * 1,
                                                   eventDescription: "Demo 2",
@@ -135,13 +135,13 @@ struct ScheduleView: View {
                                                   eventDescription: "Demo 3",
                                                   twelveHourTime: $twelveHourTime))
                         
-                        addEvent(event: EventView(eventColor: Color.red,
+                        addEvent(event: EventView(eventColor: Color.blue,
                                                   startTime: "8:00am", endTime: "9:00am",
                                                   eventDate: Date.startOfWeek(date: observedDate) + 86400 * 3,
                                                   eventDescription: "Demo 4",
                                                   twelveHourTime: $twelveHourTime))
                         
-                        addEvent(event: EventView(eventColor: Color.red,
+                        addEvent(event: EventView(eventColor: Color.orange,
                                                   startTime: "10:00am", endTime: "11:00am",
                                                   eventDate: Date.startOfWeek(date: observedDate) + 86400 * 4,
                                                   eventDescription: "Demo 5",
@@ -316,7 +316,7 @@ struct ScheduleView: View {
                     .frame(maxWidth: 2,
                            maxHeight: .infinity)
                 
-                DayView(associatedDate: givenDate, events: eventBinding)
+                DayView(associatedDate: givenDate, events: eventBinding, twelveHour: $twelveHourTime)
             }
         }
         else {
