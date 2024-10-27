@@ -38,7 +38,7 @@ struct ScheduleView: View {
                 .border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
                 .cornerRadius(3.0)
                 .background(displayButtonColors[0][0])
-                .foregroundColor(displayButtonColors[0][1])
+                .foregroundStyle(displayButtonColors[0][1])
                 
                 Button("Week") {
                     present = .Week
@@ -50,7 +50,7 @@ struct ScheduleView: View {
                 .border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
                 .cornerRadius(3.0)
                 .background(displayButtonColors[1][0])
-                .foregroundColor(displayButtonColors[1][1])
+                .foregroundStyle(displayButtonColors[1][1])
                 
                 Button("Month") {
                     present = .Month
@@ -62,7 +62,7 @@ struct ScheduleView: View {
                 .border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
                 .cornerRadius(3.0)
                 .background(displayButtonColors[2][0])
-                .foregroundColor(displayButtonColors[2][1])
+                .foregroundStyle(displayButtonColors[2][1])
                 
                 if (present != .Month) {
                     Toggle(timeTypeTitle, isOn:$twelveHourTime)
@@ -94,8 +94,16 @@ struct ScheduleView: View {
                 }
                 
                 ScrollView(.vertical, showsIndicators: false) {
-                    HStack {
-                        createCalenderDisplay(date: observedDate)
+                    ZStack {
+                        if (present != .Month) {
+                            VStack {
+                                displayTimeGuidelines()
+                            }
+                        }
+                        
+                        HStack {
+                            createCalenderDisplay(date: observedDate)
+                        }
                     }
                 }
                 .background(Color(red: 74/255, green: 255/255, blue: 230/255, opacity: 1.0))
@@ -154,7 +162,7 @@ struct ScheduleView: View {
                 .border(Color.black, width: 1)
                 .sheet(isPresented: $showEventAdderScreen,
                        content: {
-                        AddEventScreenView(requestingSchedule: self)
+                        AddEventScreenView(requestingSchedule: self, twelveHour: twelveHourTime)
                        }
                 )
             }
@@ -280,6 +288,22 @@ struct ScheduleView: View {
         }
         .padding(2)
         .border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
+    }
+    
+    @ViewBuilder private func displayTimeGuidelines() -> some View {
+                         //0,  1,   2,   3,   4,   5,   6,   7,   8,   9,   10,  11,  12,  1,   2,   3
+        let padding12Arr = [105, 102, 103, 104, 102, 104, 106, 103, 104, 103, 104, 103, 104, 103, 103, 103, 103, 103, 103, 103, 104, 104, 104, 107]
+        let padding24Arr = [115, 114, 114, 113, 113, 112, 112, 112, 111, 111, 111, 111, 111, 111, 111, 111, 112, 112, 112, 113, 113, 113, 113, 115]
+        
+        ForEach(0..<24) { hour in
+            Rectangle()
+                .foregroundStyle(Color(red: 0/255, green: 0/255, blue: 0/255, opacity: 0.7))
+                .frame(width: .infinity, height: 1)
+                .padding(EdgeInsets(top: 0,
+                                    leading: 0,
+                                    bottom: CGFloat((twelveHourTime) ? padding12Arr[hour] : padding24Arr[hour]),
+                                    trailing: 0))
+        }
     }
     
     @ViewBuilder private func createCalenderDisplay(date: Date) -> some View {

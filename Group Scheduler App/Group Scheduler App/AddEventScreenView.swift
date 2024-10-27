@@ -10,13 +10,13 @@ import SwiftUI
 
 struct AddEventScreenView: View {
     @State var requestingSchedule: ScheduleView
+    @State var twelveHour: Bool
     @State private var startAMPMChecker: Bool = true
     @State private var endAMPMChecker: Bool = true
-    @State private var twelveHour: Bool = true
     @State private var newEventStartTime: String = ""
     @State private var newEventEndTime: String = ""
     @State private var newEventDescription: String = ""
-    @State private var timeTypeTitle: String = "12 HR"
+    @State private var timeTypeTitle: String = ""
     @State private var errorMessage: String = ""
     @State private var selectedDate: Date = Date.startOfDay(date: Date())
     @State private var prevCharValue: UInt8? = 0
@@ -141,6 +141,9 @@ struct AddEventScreenView: View {
         }
         .presentationDetents([.height(325), .large])
         .frame(alignment: .leading)
+        .onAppear() {
+            timeTypeTitle = ((twelveHour) ? "12 " : "24 ") + "HR"
+        }
     }
     
     private func enforce12HrFormat(eventTime: String, _ before: String) -> String {
@@ -347,6 +350,6 @@ struct AddEventScreenView: View {
 
 #Preview {
     AddEventScreenView(requestingSchedule: ScheduleView(ID: "demoo",
-                                                        mainScreen: ContentView(showSchedule: false)))
+                                                        mainScreen: ContentView(showSchedule: false)), twelveHour: true)
 }
 
