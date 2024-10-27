@@ -57,6 +57,7 @@ struct EventView: View {
         let first = ((startFirst == 12) ? startFirst - 12 : startFirst) * 100 + ((startAmOrPm == "am") ? 0 : 12) * 100 + startSecond
         if (first < 1000) {startTime += "0"}
         startTime += String(first)
+        if (first == 0) {startTime += "00"}
         
         let endFirst = Int(endTimeArr[0])!
         let endSecond = Int(endTimeArr[1].prefix(2))!
@@ -65,6 +66,7 @@ struct EventView: View {
         let end = ((endFirst == 12) ? endFirst - 12 : endFirst) * 100 + ((endAmOrPm == "am") ? 0 : 12) * 100 + endSecond
         if (end < 1000) {endTime += "0"}
         endTime += String(end)
+        if (end == 0) {endTime = "2400"}
     }
     
     func twentyFourHourTo12Hour() {
@@ -72,14 +74,12 @@ struct EventView: View {
         var startFirst = Int(startTime.prefix(2))!
         let startSecond = Int(startTime.suffix(2))!
         
-        print(startFirst)
-        print(startSecond)
-        print()
-        
         if (startFirst > 12) {
+            startAmPm = (startFirst == 24) ? true : false
             startFirst -= 12
-            startAmPm = false
         }
+        else if (startFirst == 12) {startAmPm = false}
+        else if (startFirst == 0) {startFirst += 12}
         startTime = String(startFirst) + ":" + ((startSecond < 10) ? "0" : "") + String(startSecond) + ((startAmPm) ? "am" : "pm")
         
         var endAmPm = true
@@ -87,9 +87,11 @@ struct EventView: View {
         let endSecond = Int(endTime.suffix(2))!
         
         if (endFirst > 12) {
+            endAmPm = (endFirst == 24) ? true : false
             endFirst -= 12
-            endAmPm = false
         }
+        else if (endFirst == 12) {endAmPm = false}
+        else if (endFirst == 0) {endFirst += 12}
         endTime = String(endFirst) + ":" + ((endSecond < 10) ? "0" : "") + String(endSecond) + ((endAmPm) ? "am" : "pm")
     }
 }

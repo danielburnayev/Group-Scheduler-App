@@ -175,7 +175,7 @@ struct ScheduleView: View {
         addEvent(event: e)
     }
     
-    func addEvent(event: EventView) {
+    private func addEvent(event: EventView) {
         let date = Date.startOfDay(date: event.eventDate)
         let dateComps = DateComponents(year: Int(Date.getYearNum(date: date)),
                                        month: Int(Date.getMonthNum(date: date)), 
@@ -291,7 +291,7 @@ struct ScheduleView: View {
                     let time24 = ((hour < 10) ? "0" : "") + "\(hour)00"
                     let time12 = make12HourTime(hour: hour)
                     Text((twelveHourTime) ? time12 : time24)
-                        .padding(EdgeInsets(top: 0, leading: 3, bottom: 40, trailing: 3))
+                        .padding(EdgeInsets(top: 0, leading: 3, bottom: 60, trailing: 3))
                         .font(.system(size: (twelveHourTime) ? 19 : 22))
                         .multilineTextAlignment(.center)
                 }

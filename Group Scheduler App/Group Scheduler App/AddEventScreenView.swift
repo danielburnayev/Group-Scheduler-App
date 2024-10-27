@@ -112,10 +112,15 @@ struct AddEventScreenView: View {
                 if ((twelveHour) ? check12HourTime() : check24HourTime()) {
                     var finalStartTime = newEventStartTime
                     var finalEndTime = newEventEndTime
+                    let time: Int
                     if (twelveHour) {
                         finalStartTime += (startAMPMChecker) ? "am" : "pm"
                         finalEndTime += (endAMPMChecker) ? "am" : "pm"
+                        time = twelveHourInto24Hour(timeArr: newEventStartTime.split(separator: ":"),
+                                                    amPM: startAMPMChecker)
                     }
+                    else {time = Int(finalStartTime)!}
+                    selectedDate += (Double(time / 100) * 3600) + (Double(time % 100) * 60)
                     
                     requestingSchedule.createEvent(eventColor: Color.yellow,
                                                    startTime: finalStartTime, endTime: finalEndTime,

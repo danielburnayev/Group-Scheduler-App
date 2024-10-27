@@ -38,6 +38,14 @@ extension Date {
         )) ?? 0
     }
     
+    static func getHourHum(date: Date) -> Int {
+        return Calendar.current.component(Calendar.Component.hour, from: date)
+    }
+    
+    static func getMinuteHum(date: Date) -> Int {
+        return Calendar.current.component(Calendar.Component.minute, from: date)
+    }
+    
     static func startOfWeek(date: Date) -> Date {
         return date - (86400 * (getWeekDayNum(date: date) - 1))
     }
