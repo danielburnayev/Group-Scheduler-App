@@ -49,8 +49,9 @@ extension Date {
     static func startOfDay(date: Date) -> Date {
         let hourToSec = Calendar.current.component(Calendar.Component.hour, from: date) * 3600
         let minToSec = Calendar.current.component(Calendar.Component.minute, from: date) * 60
+        let sec = Calendar.current.component(Calendar.Component.second, from: date)
         
-        return date - Double(hourToSec + minToSec)
+        return date - Double(hourToSec + minToSec + sec)
     }
     
     static func lastDayOfMonth(date: Date) -> Date {

@@ -12,8 +12,8 @@ struct ScheduleView: View {
     
     @State var ID: String
     @State var mainScreen: ContentView
+    @State var twelveHourTime: Bool = true
     @State private var leaveSchedule: Bool = false
-    @State private var twelveHourTime: Bool = true
     @State private var showEventAdderScreen: Bool = false
     @State private var timeTypeTitle: String = "12 HR"
     @State private var present: SchedulePresentOption = .Week
@@ -22,7 +22,8 @@ struct ScheduleView: View {
     [[Color.white, Color.blue],
      [Color.blue, Color.white],
      [Color.white, Color.blue]]
-    @State private var eventDictionary: [Date : DayView] = [:]
+    @State private var eventDictionary: [DateComponents : [EventView]] = [:]
+    @State private var bottomSheet: Bool = true
     
     var body : some View {
         if (!leaveSchedule) {
@@ -97,6 +98,7 @@ struct ScheduleView: View {
                         createCalenderDisplay(date: observedDate)
                     }
                 }
+                .background(Color(red: 47/255, green: 237/255, blue: 211/255, opacity: 1.0))
                 .frame(maxWidth: .infinity,
                        maxHeight: .infinity,
                        alignment: .top)
@@ -115,7 +117,35 @@ struct ScheduleView: View {
                     .border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/, width: /*@START_MENU_TOKEN@*/1/*@END_MENU_TOKEN@*/)
                     
                     Button("Demo button") {
-                        print("Display demo days")
+                        addEvent(event: EventView(eventColor: Color.red,
+                                                  startTime: "1:00am", endTime: "2:00am",
+                                                  eventDate: Date.startOfWeek(date: observedDate),
+                                                  eventDescription: "Demo 1",
+                                                  twelveHourTime: $twelveHourTime))
+                        
+                        addEvent(event: EventView(eventColor: Color.red,
+                                                  startTime: "3:00am", endTime: "4:00am",
+                                                  eventDate: Date.startOfWeek(date: observedDate) + 86400 * 1,
+                                                  eventDescription: "Demo 2",
+                                                  twelveHourTime: $twelveHourTime))
+                        
+                        addEvent(event: EventView(eventColor: Color.red,
+                                                  startTime: "6:00am", endTime: "7:00am",
+                                                  eventDate: Date.startOfWeek(date: observedDate) + 86400 * 2,
+                                                  eventDescription: "Demo 3",
+                                                  twelveHourTime: $twelveHourTime))
+                        
+                        addEvent(event: EventView(eventColor: Color.red,
+                                                  startTime: "8:00am", endTime: "9:00am",
+                                                  eventDate: Date.startOfWeek(date: observedDate) + 86400 * 3,
+                                                  eventDescription: "Demo 4",
+                                                  twelveHourTime: $twelveHourTime))
+                        
+                        addEvent(event: EventView(eventColor: Color.red,
+                                                  startTime: "10:00am", endTime: "11:00am",
+                                                  eventDate: Date.startOfWeek(date: observedDate) + 86400 * 4,
+                                                  eventDescription: "Demo 5",
+                                                  twelveHourTime: $twelveHourTime))
                     }
                     .border(Color.black, width: 1)
                 }
@@ -123,11 +153,8 @@ struct ScheduleView: View {
                        maxHeight: 30)
                 .border(Color.black, width: 1)
                 .sheet(isPresented: $showEventAdderScreen,
-                       onDismiss: {
-                         print("sheet dismissed")
-                        },
                        content: {
-                    AddEventScreenView(requestingSchedule: self)
+                        AddEventScreenView(requestingSchedule: self)
                        }
                 )
             }
@@ -137,11 +164,28 @@ struct ScheduleView: View {
         }
     }
     
+    func createEvent(eventColor: Color, startTime: String, endTime: String, eventDate: Date, eventDescription: String) {
+        
+        let e = EventView(eventColor: eventColor,
+                          startTime: startTime, endTime: endTime,
+                          eventDate: eventDate,
+                          eventDescription: eventDescription,
+                          twelveHourTime: $twelveHourTime)
+        
+        addEvent(event: e)
+    }
+    
     func addEvent(event: EventView) {
-        var coorespondingDayView = eventDictionary[event.eventDate]
-        if (coorespondingDayView == nil) {coorespondingDayView = DayView()}
-        //coorespondingDayView.events.append(event)
-        //eventDictionary.updateValue(coorespondingDayView.associatedDate, forKey: coorespondingDayView)
+        let date = Date.startOfDay(date: event.eventDate)
+        let dateComps = DateComponents(year: Int(Date.getYearNum(date: date)),
+                                       month: Int(Date.getMonthNum(date: date)), 
+                                       day: Int(Date.getDayNum(date: date)))
+        var dayEvents = eventDictionary[dateComps]
+        
+        if (dayEvents == nil) {dayEvents = [event]}
+        else {dayEvents!.append(event)}
+        
+        eventDictionary.updateValue(dayEvents!, forKey: dateComps)
     }
     
     private func getCorrespondingButtonText() -> [String] {
@@ -187,7 +231,7 @@ struct ScheduleView: View {
                             .day()
                     )
             
-            return "\(startDay) – \(endDay)"
+            return "\(startDay) – \(endDay)\n\(Int(Date.getYearNum(date: date)))"
         }
     }
       
@@ -220,6 +264,7 @@ struct ScheduleView: View {
         Text(getCorrespondingDayTitle(date: date))
             .bold()
             .padding(2)
+            .multilineTextAlignment(.center)
         
         Button(buttonNames[1]) {
             switch present {
@@ -242,22 +287,36 @@ struct ScheduleView: View {
             let dayAmount = (present == .Day) ? 1 : 7
             
             VStack {
-                ForEach(0..<25) { hour in
-                    Text(((hour < 10) ? "0" : "") + "\(hour)\n00")
-                        .padding(.bottom, 5.0)
+                ForEach(0..<24) { hour in
+                    let time24 = ((hour < 10) ? "0" : "") + "\(hour)00"
+                    let time12 = make12HourTime(hour: hour)
+                    Text((twelveHourTime) ? time12 : time24)
+                        .padding(EdgeInsets(top: 0, leading: 3, bottom: 40, trailing: 3))
+                        .font(.system(size: (twelveHourTime) ? 19 : 22))
+                        .multilineTextAlignment(.center)
                 }
+                Text("")
             }
+            .background(Color.pink)
             .frame(maxWidth: 40,
                    maxHeight: .infinity,
                    alignment: .top)
-            .background(Color.pink)
             
-            ForEach(0..<dayAmount, id: \.self) {_ in
+            ForEach(0..<dayAmount, id: \.self) {day in
+                let givenDate = Date.startOfWeek(date: Date.startOfDay(date: date)) + Double(86400 * day)
+                let dateComps = DateComponents(year: Int(Date.getYearNum(date: givenDate)),
+                                               month: Int(Date.getMonthNum(date: givenDate)),
+                                               day: Int(Date.getDayNum(date: givenDate)))
+                let eventBinding = Binding(
+                        get: { eventDictionary[dateComps] ?? [] },
+                        set: { eventDictionary[dateComps] = $0 }
+                    )
+                
                 Rectangle()
                     .frame(maxWidth: 2,
                            maxHeight: .infinity)
                 
-                DayView(/* startOfWeek(date: observedDate)*/)
+                DayView(associatedDate: givenDate, events: eventBinding)
             }
         }
         else {
@@ -294,7 +353,15 @@ struct ScheduleView: View {
                     }
                 }
             }
+            .padding(.top, 5)
         }
+    }
+    
+    private func make12HourTime(hour: Int) -> String {
+        let hour12 = hour % 12
+            
+        if (hour12 == 0) {return "12 " + ((hour == 0) ? "am" : "pm")}
+        return "\(hour12) " + ((hour < 12) ? "am" : "pm")
     }
     
     @ViewBuilder private func displayWeekdayText(date: Date) -> some View {
@@ -345,5 +412,6 @@ struct ScheduleView: View {
 
 #Preview {
     ScheduleView(ID: "demoo", 
-                 mainScreen: ContentView(showSchedule: true))
+                 mainScreen: ContentView(showSchedule: true),
+                 twelveHourTime: true)
 }

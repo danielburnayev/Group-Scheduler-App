@@ -9,18 +9,19 @@ import Foundation
 import SwiftUI
 
 struct AddEventScreenView: View {
+    @State var requestingSchedule: ScheduleView
     @State private var startAMPMChecker: Bool = true
     @State private var endAMPMChecker: Bool = true
-    @State private var twelveHourTime: Bool = true
+    @State private var twelveHour: Bool = true
     @State private var newEventStartTime: String = ""
     @State private var newEventEndTime: String = ""
     @State private var newEventDescription: String = ""
     @State private var timeTypeTitle: String = "12 HR"
     @State private var errorMessage: String = ""
-    @State private var selectedDate: Date = Date()
+    @State private var selectedDate: Date = Date.startOfDay(date: Date())
     @State private var prevCharValue: UInt8? = 0
     @State private var prevI: Int? = nil
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         VStack {
@@ -37,10 +38,10 @@ struct AddEventScreenView: View {
                         .clipShape(Capsule())
                         .multilineTextAlignment(.center)
                         .onChange(of: newEventStartTime) { before, after in
-                            newEventStartTime = (twelveHourTime) ? enforce12HrFormat(eventTime: newEventStartTime, before) : enforce24HrFormat(eventTime: newEventStartTime)
+                            newEventStartTime = (twelveHour) ? enforce12HrFormat(eventTime: newEventStartTime, before) : enforce24HrFormat(eventTime: newEventStartTime)
                         }
                     
-                    if (twelveHourTime) {
+                    if (twelveHour) {
                         Toggle((startAMPMChecker) ? "AM" : "PM",
                                isOn: $startAMPMChecker)
                         .toggleStyle(.button)
@@ -59,10 +60,10 @@ struct AddEventScreenView: View {
                         .clipShape(Capsule())
                         .multilineTextAlignment(.center)
                         .onChange(of: newEventEndTime) { before, after in
-                            newEventEndTime = (twelveHourTime) ? enforce12HrFormat(eventTime: newEventEndTime, before) : enforce24HrFormat(eventTime: newEventEndTime)
+                            newEventEndTime = (twelveHour) ? enforce12HrFormat(eventTime: newEventEndTime, before) : enforce24HrFormat(eventTime: newEventEndTime)
                         }
                     
-                    if (twelveHourTime) {
+                    if (twelveHour) {
                         Toggle((endAMPMChecker) ? "AM" : "PM",
                                isOn: $endAMPMChecker)
                         .toggleStyle(.button)
@@ -71,15 +72,15 @@ struct AddEventScreenView: View {
                     }
                 }
                 
-                Toggle(timeTypeTitle, isOn:$twelveHourTime)
+                Toggle(timeTypeTitle, isOn:$twelveHour)
                     .toggleStyle(.button)
-                    .onChange(of: twelveHourTime) {
+                    .onChange(of: twelveHour) {
                         clearErrorMessage()
                         newEventStartTime = ""
                         newEventEndTime = ""
                         
                         timeTypeTitle =
-                        ((twelveHourTime) ? "12" : "24") + " HR"
+                        ((twelveHour) ? "12" : "24") + " HR"
                     }
                     .cornerRadius(5)
                     .border(Color.blue, width: 2)
@@ -91,12 +92,7 @@ struct AddEventScreenView: View {
             .frame(maxWidth: 170)
             .onChange(of: selectedDate) {
                 clearErrorMessage()
-                
-                let hourToSec = Calendar.current.component(Calendar.Component.hour, from: selectedDate) * 3600
-                let minToSec = Calendar.current.component(Calendar.Component.minute, from: selectedDate) * 60
-                
-                selectedDate -= Double(hourToSec + minToSec)
-                //selectedDate += Double()
+                selectedDate = Date.startOfDay(date: selectedDate)
             }
             
             HStack {
@@ -113,8 +109,19 @@ struct AddEventScreenView: View {
             
             Button("Include New Event") {
                 clearErrorMessage()
-                if ((twelveHourTime) ? check12HourTime() : check24HourTime()) {
-                    var event = EventView(eventColor: Color.yellow, startTime: newEventStartTime, endTime: newEventEndTime, eventDescription: newEventDescription)
+                if ((twelveHour) ? check12HourTime() : check24HourTime()) {
+                    var finalStartTime = newEventStartTime
+                    var finalEndTime = newEventEndTime
+                    if (twelveHour) {
+                        finalStartTime += (startAMPMChecker) ? "am" : "pm"
+                        finalEndTime += (endAMPMChecker) ? "am" : "pm"
+                    }
+                    
+                    requestingSchedule.createEvent(eventColor: Color.yellow,
+                                                   startTime: finalStartTime, endTime: finalEndTime,
+                                                   eventDate: selectedDate,
+                                                   eventDescription: newEventDescription)
+
                     dismiss()
                 }
             }
@@ -127,11 +134,11 @@ struct AddEventScreenView: View {
                 .foregroundStyle(Color.red)
                 .multilineTextAlignment(.center)
         }
-        .presentationDetents([.height(250), .large])
+        .presentationDetents([.height(325), .large])
         .frame(alignment: .leading)
     }
     
-    func enforce12HrFormat(eventTime: String, _ before: String) -> String {
+    private func enforce12HrFormat(eventTime: String, _ before: String) -> String {
         var beforeTemp = String(before)
         var newTimeTemp = String(eventTime)
         
@@ -184,7 +191,7 @@ struct AddEventScreenView: View {
         return newTimeTemp
     }
     
-    func checkForErrors12Hr(timeCount: Int, arr: [Character], i: Int, errorStr: inout String, colonIndex: inout Int) {
+    private func checkForErrors12Hr(timeCount: Int, arr: [Character], i: Int, errorStr: inout String, colonIndex: inout Int) {
         if (timeCount == 6) {
             errorStr = "Times cannot have a length of more than 5."
         }
@@ -199,7 +206,7 @@ struct AddEventScreenView: View {
                 errorStr = "The colon character is placed incorrectly."
             }
         }
-        else if ( (arr[i].asciiValue ?? 0 >= 48 && arr[i].asciiValue ?? 0 <= 57)) {
+        else if (arr[i].asciiValue ?? 0 >= 48 && arr[i].asciiValue ?? 0 <= 57) {
             if (timeCount > 1 && arr[1] == ":") {colonIndex = 1}
             else if (timeCount > 2 && arr[2] == ":") {colonIndex = 2}
             
@@ -210,7 +217,7 @@ struct AddEventScreenView: View {
         }
     }
     
-    func enforce24HrFormat(eventTime: String) -> String {
+    private func enforce24HrFormat(eventTime: String) -> String {
         var newEventTime = eventTime
         var charValue: UInt8
         let theIndex: String.Index
@@ -243,7 +250,7 @@ struct AddEventScreenView: View {
         return newEventTime
     }
     
-    func check12HourTime() -> Bool {
+    private func check12HourTime() -> Bool {
         if (!checkTimeLength()) {return false}
         
         let startTimeArr = newEventStartTime.split(separator: ":")
@@ -259,7 +266,7 @@ struct AddEventScreenView: View {
         return checkForUnorderedTimes(startTime: startTime, endTime: endTime)
     }
     
-    func check12HourTimeDigits(arr: [Substring], errorMessage: String) -> Bool {
+    private func check12HourTimeDigits(arr: [Substring], errorMessage: String) -> Bool {
         var validTime = true
         
         if (arr[0].first! == "0" || Int(arr[0])! < 1 || Int(arr[0])! > 12 || Int(arr[1])! > 59) {
@@ -270,14 +277,14 @@ struct AddEventScreenView: View {
         return validTime
     }
     
-    func twelveHourInto24Hour(timeArr: [Substring], amPM: Bool) -> Int {
+    private func twelveHourInto24Hour(timeArr: [Substring], amPM: Bool) -> Int {
         let firstInt = Int(timeArr[0])!
         let secondInt = Int(timeArr[1])!
         
         return ((firstInt == 12) ? firstInt - 12 : firstInt) * 100 + ((amPM) ? 0 : 12) * 100 + secondInt
     }
     
-    func check24HourTime() -> Bool {
+    private func check24HourTime() -> Bool {
         if (!checkTimeLength()) {return false}
         
         let startTime = Int(newEventStartTime)!
@@ -290,7 +297,7 @@ struct AddEventScreenView: View {
         return checkForUnorderedTimes(startTime: startTime, endTime: endTime)
     }
     
-    func check24HourTimeDigits(time: Int, errorMessage: String) -> Bool {
+    private func check24HourTimeDigits(time: Int, errorMessage: String) -> Bool {
         var validTime = true
         
         if (time / 100 > 24 || time % 100 > 59 || time > 2400) {
@@ -301,7 +308,7 @@ struct AddEventScreenView: View {
         return validTime
     }
     
-    func checkForUnorderedTimes(startTime: Int, endTime: Int) -> Bool {
+    private func checkForUnorderedTimes(startTime: Int, endTime: Int) -> Bool {
         var timesInRightOrder = true
         
         if (startTime > endTime) {
@@ -312,30 +319,29 @@ struct AddEventScreenView: View {
         return timesInRightOrder
     }
     
-    func checkTimeLength() -> Bool {
+    private func checkTimeLength() -> Bool {
         var validLengths = true
         
         if (newEventStartTime.count < 4) {
-            appendToErrorMessage(message: "The start time must be " + ((twelveHourTime) ? "at least " : "") +  "4 characters long.\n")
+            appendToErrorMessage(message: "The start time must be " + ((twelveHour) ? "at least " : "") +  "4 characters long.\n")
             validLengths = false
         }
         if (newEventEndTime.count < 4) {
-            appendToErrorMessage(message: "The end time must be " + ((twelveHourTime) ? "at least " : "") +  "4 characters long.\n")
+            appendToErrorMessage(message: "The end time must be " + ((twelveHour) ? "at least " : "") +  "4 characters long.\n")
             validLengths = false
         }
         return validLengths
     }
     
-    func addNewEvent() {}
+    private func clearErrorMessage() {errorMessage = ""}
     
-    func clearErrorMessage() {errorMessage = ""}
+    private func assignErrorMessage(message: String) {errorMessage = message}
     
-    func assignErrorMessage(message: String) {errorMessage = message}
-    
-    func appendToErrorMessage(message: String) {errorMessage += message}
+    private func appendToErrorMessage(message: String) {errorMessage += message}
 }
 
 #Preview {
-    AddEventScreenView()
+    AddEventScreenView(requestingSchedule: ScheduleView(ID: "demoo",
+                                                        mainScreen: ContentView(showSchedule: false)))
 }
 
