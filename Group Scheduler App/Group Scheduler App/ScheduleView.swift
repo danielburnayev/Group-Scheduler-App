@@ -291,7 +291,6 @@ struct ScheduleView: View {
     }
     
     @ViewBuilder private func displayTimeGuidelines() -> some View {
-                         //0,  1,   2,   3,   4,   5,   6,   7,   8,   9,   10,  11,  12,  1,   2,   3
         let padding12Arr = [105, 102, 103, 104, 102, 104, 106, 103, 104, 103, 104, 103, 104, 103, 103, 103, 103, 103, 103, 103, 104, 104, 104, 107]
         let padding24Arr = [115, 114, 114, 113, 113, 112, 112, 112, 111, 111, 111, 111, 111, 111, 111, 111, 112, 112, 112, 113, 113, 113, 113, 115]
         
@@ -301,7 +300,7 @@ struct ScheduleView: View {
                 .frame(width: .infinity, height: 1)
                 .padding(EdgeInsets(top: 0,
                                     leading: 0,
-                                    bottom: CGFloat((twelveHourTime) ? padding12Arr[hour] : padding24Arr[hour]),
+                                    bottom: CGFloat((twelveHourTime) ? padding12Arr[hour] /*115*/: padding24Arr[hour] /*125*/),
                                     trailing: 0))
         }
     }
@@ -327,7 +326,7 @@ struct ScheduleView: View {
                    alignment: .top)
             
             ForEach(0..<dayAmount, id: \.self) {day in
-                let givenDate = Date.startOfWeek(date: Date.startOfDay(date: date)) + Double(86400 * day)
+                let givenDate = (present == .Week) ? Date.startOfWeek(date: Date.startOfDay(date: date)) + Double(86400 * day) : Date.startOfDay(date: date)
                 let dateComps = DateComponents(year: Int(Date.getYearNum(date: givenDate)),
                                                month: Int(Date.getMonthNum(date: givenDate)),
                                                day: Int(Date.getDayNum(date: givenDate)))
