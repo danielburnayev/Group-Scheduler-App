@@ -13,9 +13,11 @@ struct EventView: View {
     @State var eventColor: Color
     @State var startTime: String
     @State var endTime: String
-    @State var eventDate: Date
+    @State var eventStartDate: Date
+    @State var eventEndDate: Date
     @State var eventDescription: String
     @Binding var twelveHourTime: Bool
+    @State private var height: CGFloat = 0.0
     
     var body : some View {
         VStack {
@@ -29,15 +31,19 @@ struct EventView: View {
         .frame(minWidth: 1,
                maxWidth: 393,
                minHeight: 1,
-               maxHeight: 150,
+               maxHeight: height,
                alignment: .topLeading)
         .background(eventColor)
         .border(/*@START_MENU_TOKEN@*/Color.black/*@END_MENU_TOKEN@*/, width: 0.5)
         .onAppear() {
+            height = eventHeight()
+            
             if (twelveHourTime && !startTime.contains(":")) {twentyFourHourTo12Hour()}
             else if (!twelveHourTime && startTime.contains(":")) {twelveHourTo24Hour()}
         }
         .onChange(of: twelveHourTime) {
+            height = eventHeight()
+            
             if (!twelveHourTime) {twelveHourTo24Hour()}
             else {twentyFourHourTo12Hour()}
         }
@@ -94,11 +100,23 @@ struct EventView: View {
         else if (endFirst == 0) {endFirst += 12}
         endTime = String(endFirst) + ":" + ((endSecond < 10) ? "0" : "") + String(endSecond) + ((endAmPm) ? "am" : "pm")
     }
+    
+    private func eventHeight() -> CGFloat {
+        let startHour = Date.getHourNum(date: eventStartDate)
+        let startMin = Date.getMinuteNum(date: eventStartDate)
+        let startValue = CGFloat(startHour * ((twelveHourTime) ? 115 : 125)) + (CGFloat(integerLiteral: startMin) / 60) * ((twelveHourTime) ? 115 : 125)
+        
+        let endHour = Date.getHourNum(date: eventEndDate)
+        let endMin = Date.getMinuteNum(date: eventEndDate)
+        let endValue = CGFloat(endHour * ((twelveHourTime) ? 115 : 125)) + (CGFloat(integerLiteral: endMin) / 60) * ((twelveHourTime) ? 115 : 125)
+        
+        return endValue - startValue
+    }
 }
 
 //#Preview {
 //    EventView(eventColor: .yellow, 
 //              startTime: "3:00pm", endTime: "6:00pm",
-//              eventDate: Date(),
+//              eventStartDate: Date(),
 //              eventDescription: "Event 1")
 //}

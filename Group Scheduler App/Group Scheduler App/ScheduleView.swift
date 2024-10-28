@@ -127,31 +127,22 @@ struct ScheduleView: View {
                     Button("Demo button") {
                         addEvent(event: EventView(eventColor: Color.red,
                                                   startTime: "1:00am", endTime: "2:00am",
-                                                  eventDate: Date.startOfWeek(date: observedDate),
+                                                  eventStartDate: Date.startOfWeek(date: Date()) + 3600,
+                                                  eventEndDate: Date.startOfWeek(date: Date()) + 3600 * 2,
                                                   eventDescription: "Demo 1",
                                                   twelveHourTime: $twelveHourTime))
                         
                         addEvent(event: EventView(eventColor: Color.blue,
                                                   startTime: "3:00am", endTime: "4:00am",
-                                                  eventDate: Date.startOfWeek(date: observedDate) + 86400 * 1,
+                                                  eventStartDate: Date.startOfWeek(date: Date()) + 86400 * 1 + 3600 * 3,
+                                                  eventEndDate: Date.startOfWeek(date: Date()) + 86400 * 1 + 3600 * 4,
                                                   eventDescription: "Demo 2",
                                                   twelveHourTime: $twelveHourTime))
                         
-                        addEvent(event: EventView(eventColor: Color.red,
-                                                  startTime: "6:00am", endTime: "7:00am",
-                                                  eventDate: Date.startOfWeek(date: observedDate) + 86400 * 2,
-                                                  eventDescription: "Demo 3",
-                                                  twelveHourTime: $twelveHourTime))
-                        
-                        addEvent(event: EventView(eventColor: Color.blue,
-                                                  startTime: "8:00am", endTime: "9:00am",
-                                                  eventDate: Date.startOfWeek(date: observedDate) + 86400 * 3,
-                                                  eventDescription: "Demo 4",
-                                                  twelveHourTime: $twelveHourTime))
-                        
                         addEvent(event: EventView(eventColor: Color.orange,
-                                                  startTime: "10:00am", endTime: "11:00am",
-                                                  eventDate: Date.startOfWeek(date: observedDate) + 86400 * 4,
+                                                  startTime: "1000", endTime: "1100",
+                                                  eventStartDate: Date.startOfWeek(date: Date()) + 86400 * 4 + 3600 * 10,
+                                                  eventEndDate: Date.startOfWeek(date: Date()) + 86400 * 4 + 3600 * 11,
                                                   eventDescription: "Demo 5",
                                                   twelveHourTime: $twelveHourTime))
                     }
@@ -172,11 +163,12 @@ struct ScheduleView: View {
         }
     }
     
-    func createEvent(eventColor: Color, startTime: String, endTime: String, eventDate: Date, eventDescription: String) {
+    func createEvent(eventColor: Color, startTime: String, endTime: String, eventStartDate: Date, eventEndDate: Date, eventDescription: String) {
         
         let e = EventView(eventColor: eventColor,
                           startTime: startTime, endTime: endTime,
-                          eventDate: eventDate,
+                          eventStartDate: eventStartDate,
+                          eventEndDate: eventEndDate,
                           eventDescription: eventDescription,
                           twelveHourTime: $twelveHourTime)
         
@@ -184,7 +176,7 @@ struct ScheduleView: View {
     }
     
     private func addEvent(event: EventView) {
-        let date = Date.startOfDay(date: event.eventDate)
+        let date = Date.startOfDay(date: event.eventStartDate)
         let dateComps = DateComponents(year: Int(Date.getYearNum(date: date)),
                                        month: Int(Date.getMonthNum(date: date)), 
                                        day: Int(Date.getDayNum(date: date)))

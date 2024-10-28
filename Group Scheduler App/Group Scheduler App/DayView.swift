@@ -18,8 +18,8 @@ struct DayView: View {
         ZStack {
             ForEach(0..<events.count, id:\.self) { index in
                 events[index]
-                    .offset(y: CGFloat(integerLiteral: Date.getHourHum(date: events[index].eventDate)) * ((twelveHour) ? 115 : 125) +
-                                   (CGFloat(integerLiteral: Date.getMinuteHum(date: events[index].eventDate)) / 60) * ((twelveHour) ? 115 : 125))
+                    .offset(y: CGFloat(integerLiteral: Date.getHourNum(date: events[index].eventStartDate)) * ((twelveHour) ? 115 : 125) +
+                                   (CGFloat(integerLiteral: Date.getMinuteNum(date: events[index].eventStartDate)) / 60) * ((twelveHour) ? 115 : 125))
             }
             //115 padding for every hour (for AMPM)
             //125 padding for every hour (for 24-hour)

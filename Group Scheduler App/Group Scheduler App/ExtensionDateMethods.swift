@@ -38,11 +38,11 @@ extension Date {
         )) ?? 0
     }
     
-    static func getHourHum(date: Date) -> Int {
+    static func getHourNum(date: Date) -> Int {
         return Calendar.current.component(Calendar.Component.hour, from: date)
     }
     
-    static func getMinuteHum(date: Date) -> Int {
+    static func getMinuteNum(date: Date) -> Int {
         return Calendar.current.component(Calendar.Component.minute, from: date)
     }
     

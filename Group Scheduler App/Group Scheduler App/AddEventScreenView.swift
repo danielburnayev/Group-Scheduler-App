@@ -112,19 +112,27 @@ struct AddEventScreenView: View {
                 if ((twelveHour) ? check12HourTime() : check24HourTime()) {
                     var finalStartTime = newEventStartTime
                     var finalEndTime = newEventEndTime
-                    let time: Int
+                    let timeStart: Int
+                    let timeEnd: Int
                     if (twelveHour) {
                         finalStartTime += (startAMPMChecker) ? "am" : "pm"
                         finalEndTime += (endAMPMChecker) ? "am" : "pm"
-                        time = twelveHourInto24Hour(timeArr: newEventStartTime.split(separator: ":"),
+                        timeStart = twelveHourInto24Hour(timeArr: newEventStartTime.split(separator: ":"),
                                                     amPM: startAMPMChecker)
+                        timeEnd = twelveHourInto24Hour(timeArr: newEventEndTime.split(separator: ":"),
+                                                       amPM: endAMPMChecker)
                     }
-                    else {time = Int(finalStartTime)!}
-                    selectedDate += (Double(time / 100) * 3600) + (Double(time % 100) * 60)
+                    else {
+                        timeStart = Int(finalStartTime)!
+                        timeEnd = Int(finalEndTime)!
+                    }
+                    selectedDate += (Double(timeStart / 100) * 3600) + (Double(timeStart % 100) * 60)
+                    let theEndDate = Date.startOfDay(date: Date()) + (Double(timeEnd / 100) * 3600) + (Double(timeEnd % 100) * 60)
                     
                     requestingSchedule.createEvent(eventColor: Color.yellow,
                                                    startTime: finalStartTime, endTime: finalEndTime,
-                                                   eventDate: selectedDate,
+                                                   eventStartDate: selectedDate,
+                                                   eventEndDate: theEndDate,
                                                    eventDescription: newEventDescription)
 
                     dismiss()
